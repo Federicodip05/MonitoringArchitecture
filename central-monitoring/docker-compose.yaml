@@ -1,0 +1,42 @@
+version: "3.7"
+
+volumes:
+  grafana-data:
+  prometheus-data:
+  loki-data:
+
+services:
+  loki:
+    image: grafana/loki:latest
+    container_name: central_loki
+    env_file: .env
+    ports:
+      - ${LOKI_PORT}:3100
+    volumes:
+      - ./config/loki/loki.yaml:/mnt/config/loki.yaml
+      - loki-data:/loki
+    command:
+      - '-config.file=/mnt/config/loki.yaml'
+      - '-config.expand-env=true'
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: central_prometheus
+    volumes:
+      - ./config/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - prometheus-data:/prometheus
+    command:
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: central_grafana
+    env_file: .env
+    ports:
+      - ${GRAFANA_PORT}:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+    restart: always
