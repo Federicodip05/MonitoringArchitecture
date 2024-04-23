@@ -1,0 +1,30 @@
+version: "3.7"
+
+volumes:
+  prometheus-data:
+
+services:
+  promtail:
+    image: grafana/promtail:latest
+    container_name: piashiba_promtail
+    ports:
+      - ${PROMTAIL_PORT}:${PROMTAIL_PORT}
+    env_file: .env
+    volumes:
+      - .conf/promtail/promtail.yaml:/mnt/config/prontail.yaml
+    command:
+      - '-config.file=/mnt/config/prontail.yaml'
+      - '-config.expand-env=true'
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: piashiba_prometheus
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+    volumes:
+      - .conf/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    restart: always

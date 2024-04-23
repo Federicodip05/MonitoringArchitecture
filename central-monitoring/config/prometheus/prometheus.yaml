@@ -1,15 +1,28 @@
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
 
 scrape_configs:
-  - job_name: 'central_prometheus'
+  - job_name: 'microservice_1'
     honor_labels: true
-    metrics_path: '/federate'
+    metrics_path: '/actuator/prometheus'
     params:
       'match[]':
         - '{__name__=~".+"}'
     static_configs:
-      - targets: ['url-server:port']  # change for your prometheus server IP or DNS name and port.
+      - targets: ['microservice_1_URL:PORT']
         labels:
-          entorno: test
+          team: 'team'
+          application: 'application'
+
+  - job_name: 'microservice_2'
+    honor_labels: true
+    params:
+      'match[]':
+        - '{__name__=~".+"}'
+    static_configs:
+      - targets: ['microservice_1_URL:PORT2']
+        labels:
+          team: 'team'
+          application: 'application'
